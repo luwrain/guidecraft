@@ -1,22 +1,21 @@
 
 #pragma once
 
-#include"BusClient.h"
-
 namespace GuideCraft {
   class Bus
   {
   public:
     Bus(const std::string& name_)
       : name(name_) {}
-    virtual ~Bus() { stop(); }
+    virtual ~Bus() { close(); }
 
   public:
     void open();
-    void stop();
+    void close();
 
   private:
     const std::string name;
     int shm;
+    pthread_rwlock_t rwLock;
   };
 }

@@ -15,8 +15,5 @@ namespace GuideCraft {
 
   public:
     const std::string name;
-
-  private:
-    mqd_t mqIn, mqOut;
   };
 }

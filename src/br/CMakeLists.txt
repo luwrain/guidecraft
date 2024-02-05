@@ -1,6 +1,6 @@
 
 
-add_executable (gcr-br
+add_executable (gcr
   Broker.cpp
   BusClient.cpp
   Bus.cpp
@@ -8,4 +8,4 @@ add_executable (gcr-br
   main.cpp
   Service.cpp)
 
-target_link_libraries(gcr-br pthread rt)
+target_link_libraries(gcr pthread rt)

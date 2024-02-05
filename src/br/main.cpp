@@ -1,7 +1,7 @@
 
 #include"os.h"
-#include"Client.h"
 #include"Service.h"
+
 
 using namespace GuideCraft;
 using namespace std;
@@ -24,12 +24,14 @@ void printHelp();
 
 int main(int argc, char* argv[])
 {
+  /*
   CmdLine cmdLine(argc, argv);
   if (cmdLine.action == "help")
     {
       printHelp();
       return 0;
     }
+  */
   Service serv;
   serv.run();
 }

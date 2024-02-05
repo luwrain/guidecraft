@@ -21,9 +21,5 @@ namespace GuideCraft {
   private:
     const int id;
     std::list<Message> pending;
-    mqd_t mqOut;
-    std::auto_ptr<std::thread> thrOut;
-    std::condition_variable cvOut;
-    std::mutex mutexOut;
   };
 }
