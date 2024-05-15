@@ -34,6 +34,7 @@ int main(int argc, char* argv[])
   */
   Service serv;
   serv.run();
+  printHelp();
 }
 
 CmdLine::CmdLine(int argc, char* argv[])

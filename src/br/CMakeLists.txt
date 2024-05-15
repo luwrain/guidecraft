@@ -6,6 +6,9 @@ add_executable (gcr
   Bus.cpp
   Client.cpp
   main.cpp
-  Service.cpp)
+  Service.cpp
+  test.cpp
+  RwLock.cpp
+  )
 
 target_link_libraries(gcr pthread rt)
