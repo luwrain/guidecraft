@@ -1,6 +1,6 @@
 
 #pragma once
-
+#include <string>
 namespace GuideCraft {
   class Bus
   {

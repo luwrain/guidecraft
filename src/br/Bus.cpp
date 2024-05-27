@@ -4,68 +4,74 @@
 #include"test.h"
 #include"RwLock.h"
 #include <cstdint>
+#include <vector>
+#include "CircularQueue.h"
+#include "Message.h"
+#include "cstring"
 
-#define STORAGE_ID "/SHM_TEST"  
+ 
+#define TIMESCALE std::chrono::microseconds
+#define TIMESCALE_COUNT 1e6
+#define TIMESCALE_NAME "us"
 
 using namespace GuideCraft;
-using namespace std;
+uint64_t current_time() {
+  auto time_since_epoch = std::chrono::system_clock::now().time_since_epoch();
+  auto casted_time = std::chrono::duration_cast<TIMESCALE>(time_since_epoch);
+  return casted_time.count();
+}
 void Bus::open()
 {
   int res;
   int shm;
-  test* test_;
-  auto test_size = sizeof(test);
   auto lock_size = sizeof(RwLock);
-
+  auto buffer_size = sizeof(Buf);
   pid_t pid;
   pid = getpid();
-
-
-  shm  = shm_open(STORAGE_ID, O_CREAT | O_RDWR, SHM_MODE);
+  Buf *buf;
+  CircularQueue *queue;
+  const std::string storage = "/SHM" + name;
+  shm  = shm_open(storage.c_str(), O_CREAT | O_RDWR, SHM_MODE);
   if (shm == -1)
     perror("shm_open");
-     res = ftruncate(shm,sizeof(test));
+     res = ftruncate(shm,((LIMIT_MESSAGE_SIZE * QUEUE_SIZE)+12800));
 	if (res == -1)
 	{
 		perror("ftruncate");
 	}
+  Buf * b;
 
-  auto *ptr = mmap(nullptr, sizeof(test) , PROT_READ | PROT_WRITE,
+
+  auto *ptr = mmap(nullptr, ((LIMIT_MESSAGE_SIZE * QUEUE_SIZE)+12800) , PROT_READ | PROT_WRITE,
                    MAP_SHARED, shm, 0);	
 
-  auto *base_address= reinterpret_cast<uintptr_t*>(ptr);
-  auto *test_address = base_address;
-  auto *int_address = base_address + lock_size;
-
-  test_ = new (test_address) test();
-  uint8_t count = 1;
-  uint8_t count2 = 4;
+  auto *base_address= reinterpret_cast<char*>(ptr);
+  auto *queue_address = base_address + buffer_size;
+  b= new(base_address) Buf();
+  queue = new (queue_address) CircularQueue(b);
   double time_counter = 0;
+  std::cout << "Hello World!"<< std::endl;
+  int vector_size = 8000;
+  auto *rawptr = malloc(vector_size);
+  std::memset(rawptr, 255, vector_size);
+  Message *msg = reinterpret_cast<Message *>(rawptr);
+  msg->count = 0;
+  
 
-  clock_t this_time = clock();
-  clock_t last_time = this_time;
+  Elem el;
+  el.sz = 8000;
 
-   while(true)
-    { 
-        this_time = clock();
-
-        time_counter += (double)(this_time - last_time);
-
-        last_time = this_time;
-
-        if(time_counter > (double)(3 * CLOCKS_PER_SEC))
-        {
-            time_counter -= (double)(3 * CLOCKS_PER_SEC);
-            test_->write(int_address, &count2, sizeof(count2));
-            std::cout << "PID: " << pid<< " send: " << +count2 <<std::endl;
-
-            count2 ++;
-        }
-    }
-
-    return ;
-
-
+  int seconds = 10;
+  auto start = std::chrono::steady_clock::now();
+  for (auto now = start; now < start + std::chrono::seconds(seconds);
+       now = std::chrono::steady_clock::now()) 
+  {
+    msg->count++;
+    msg->TimeStep = current_time();
+ //   std::cout<<msg->TimeStep <<' ';
+    el.msg = reinterpret_cast<char *>(msg);
+    queue->write(&el); 
+  }
 }
 void Bus::close()
 {

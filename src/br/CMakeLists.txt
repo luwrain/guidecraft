@@ -4,9 +4,11 @@ add_executable (gcr
   Broker.cpp
   BusClient.cpp
   Bus.cpp
+  CircularQueue.cpp
   Client.cpp
   main.cpp
   Service.cpp
+  Message.cpp
   test.cpp
   RwLock.cpp
   )
